@@ -1,30 +1,37 @@
 import java.util.ArrayList;
-import static java.util.Arrays.stream;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class DFA {
-    private Tuple tuple;
+    private ArrayList<State> states;
+    private ArrayList<Alphabet> alphabetSet;
+    private TransitionFunction transitionFunction;
+    private State initialState;
+    private ArrayList<State> finalStates;
 
-    public DFA(Tuple tuple) {
-        this.tuple = tuple;
+    public DFA(ArrayList<State> states, ArrayList<Alphabet> alphabetSet, TransitionFunction transitionFunction, State state, ArrayList<State> finalStates) {
+        this.states = states;
+        this.alphabetSet = alphabetSet;
+        this.transitionFunction = transitionFunction;
+        this.initialState = state;
+        this.finalStates = finalStates;
     }
-
-    private String[] getAllAlphabets(String determinationString) {
-        return determinationString.split("");
+    private List<String> getAllAlphabets(String determinationString) {
+        return asList(determinationString.split(""));
     }
 
     public boolean isInLanguage(String determinationString) {
-        ArrayList<Alphabet> deteminationAlphabetSet = new ArrayList<>();
-        stream(getAllAlphabets(determinationString)).forEach(alphabet -> deteminationAlphabetSet.add(new Alphabet(alphabet)));
-        State currentState = tuple.getInitialState();;
-        for (int index = 0; index < deteminationAlphabetSet.size(); index++) {
-            Alphabet alphabet = deteminationAlphabetSet.get(index);
-            currentState = tuple.getTransitionFunction().getNextState(currentState,alphabet);
-
+        ArrayList<Alphabet> deteministicAlphabetSet = new ArrayList<>();
+        getAllAlphabets(determinationString).forEach(alphabet -> deteministicAlphabetSet.add(new Alphabet(alphabet)));
+        State currentState = this.initialState;
+        for (Alphabet alphabet : deteministicAlphabetSet) {
+            currentState = this.transitionFunction.getNextState(currentState, alphabet);
         }
         return isFinalState(currentState);
     }
 
     private boolean isFinalState(State state) {
-        return tuple.getFinalStates().contains(state);
+        return this.finalStates.contains(state);
     }
 }
